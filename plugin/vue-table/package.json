@@ -1,5 +1,6 @@
 {
-  "name": "vue-table-template",
+  "name": "vue-table",
+  "main": "src/main.js",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,9 +9,9 @@
   },
   "dependencies": {
     "@inowave/izi-checkbox": "git+https://repo.izibook.ru/scm/wvm/checkbox-component.git",
+    "@inowave/izi-select": "git+https://repo.izibook.ru/scm/wvm/izi-select-component.git",
     "core-js": "^3.6.5",
-    "vue": "^2.6.11",
-    "vue-datepicker-local": "^1.0.19"
+    "vue": "^2.6.11"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
