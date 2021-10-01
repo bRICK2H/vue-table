@@ -4,10 +4,9 @@
 	>
 		<div class="v-body-content">
 			<transition-group name="body-row" tag="div">
-				<VBodyRow v-for="(row, i) of getBodyRows"
+				<VBodyRow v-for="(row, i) of data.bf"
 					:key="row.id"
 					:row="row"
-					:types="getTypeCell"
 					:side="getPosition"
 					:detail="$attrs.detail"
 					:active="i === currIndex ? active : false"
@@ -36,6 +35,10 @@ export default {
 			type: Object,
 			default: () => ({})
 		},
+		height: {
+			type: [String, Number],
+			default: 500
+		}
 	},
 	data: () => ({
 		active: false,
@@ -45,16 +48,9 @@ export default {
 		setStyleMaxHeightBodyContainer() {
 			const margin = 5
 			return { 
-				maxHeight: `calc(100% - ${this.headerHeight + (margin * 2)}px)`,
+				maxHeight: `calc(${this.height} - ${this.headerHeight + (margin * 2)}px)`,
 				margin: `${margin}px ${margin}px ${margin}px ${margin * 2}px`
 			}
-		},
-		getBodyRows() {
-			console.log('getBodyBows', this.data.bf)
-			return this.data.bf
-		},
-		getTypeCell() {
-			return this.data.h.map(curr => curr.type)
 		},
 		getPosition() {
 			return this.data.h.map(curr => curr.side)

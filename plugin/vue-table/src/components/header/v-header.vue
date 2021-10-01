@@ -54,11 +54,11 @@ export default {
 		getHeaderCellWidth(value) {
 			this.cellHeights.push(value)
 		},
-		sortData({ type, sorted }, index) {
+		sortData({ type, related, sorted }, index) {
 			this.$set(this.sortOptions, 'index', index)
 			this.$set(this.filterOptions, 'index', index)
 			this.$set(this.sortOptions, 'sorted', sorted)
-			this.$emit('sort-data', { type, sorted, index })
+			this.$emit('sort-data', { type, related, sorted, index })
 		},
 	},
 	created() {

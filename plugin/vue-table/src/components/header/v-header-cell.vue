@@ -1,7 +1,7 @@
 <template>
 	<div class="v-table-header-cell"
 		:ref="headerCellRef"
-		:style="{ minWidth: `${hData.width}px`, justifyContent: `${hData.side}` }"
+		:style="{ minWidth: `${hData.width}px`, maxWidth: `${hData.width}px`, justifyContent: `${hData.side}` }"
 	>
 		<!-- SORT -->
 		<span v-show="hData.sort"
@@ -10,12 +10,12 @@
 			<span class="v-table-header-cell-sort--up"
 				:class="{ 'v-table-header-cell-sort--active-up': index === sortOptions.index && sortOptions.sorted }"
 				title="Возрастание"
-				@click="$emit('sort-data', { type: hData.type, sorted: true })"
+				@click="$emit('sort-data', { type: hData.sortType, related: hData.related, sorted: true })"
 			></span>
 			<span class="v-table-header-cell-sort--down"
 				:class="{ 'v-table-header-cell-sort--active-down': index === sortOptions.index && !sortOptions.sorted }"
 				title="Убывание"
-				@click="$emit('sort-data', { type: hData.type, sorted: false })"
+				@click="$emit('sort-data', { type: hData.sortType, related: hData.related, sorted: false })"
 			></span>
 		</span>
 
@@ -29,6 +29,7 @@
 		<!-- SELECT -->
 		<template v-else-if="component && component.name === 'select' && isFilter">
 			<VSelect
+				:width="hData.width - 40"
 				:placeholder="hData.title"
 				:raisePlaceholder="true"
 				:clearable="false"
@@ -91,8 +92,8 @@
 <script>
 import { bus } from '../../main'
 import VSelect from '@inowave/izi-select'
-import VInput from '../v-input.vue'
-import VDatePicker from '../v-datepicker.vue'
+import VInput from '../header-templates/v-input.vue'
+import VDatePicker from '../header-templates/v-datepicker.vue'
 
 export default {
 	name: 'VHeaderCell',
@@ -140,7 +141,7 @@ export default {
 			return this.hData.component && this.hData.component.name
 				? this.hData.component
 				: null
-		}
+		},
 	},
 	methods: {
 		toggleFilter() {
@@ -152,7 +153,6 @@ export default {
 				
 				if (this.component.name === 'date') {
 					this.component.value = []
-					// this.component.value = this.getDates()
 				}
 			}
 
@@ -170,12 +170,14 @@ export default {
 		},
 		getLocalSelectOptions(name) {
 			if (this.component?.name === name) {
-				const type = this.hData.type
+				const related = this.hData.related
 
 				return [...new Set(this.body.map(c => {
-					return this.component?.props?.label
-						? c[type][this.component.props.label]
-						: c[type]
+					return typeof c[related] === 'object'
+						? this.component?.props?.options && this.component?.props?.label 
+							? c[related][this.component.props.label]
+							: c[related].component.value
+						: c[related]
 				}))]
 
 			} else {
@@ -199,6 +201,7 @@ export default {
 					this.isFilter = !!this.component?.value
 				} else {
 					const { index } = options
+					
 					if (index !== this.index && this.component && (!this.component.value || !this.component.value.length)) {
 						this.isFilter = false
 					}
@@ -206,21 +209,26 @@ export default {
 			}
 		},
 		'hData.component.value': {
-			immediate: true,
 			deep: true,
+			immediate: true,
 			handler(value) {
 				bus.$emit('filter-data', {
 					value,
-					index: this.index,
-					type: this.hData.type,
-					component: this.component
+					component: this.component,
+					related: this.hData.related,
 				})
+			}
+		},
+		body: {
+			deep: true,
+			immediate: true,
+			handler() {
+				this.select.options = this.getLocalSelectOptions('select')
 			}
 		}
 	},
 	created() {
 		this.headerCellRef = this.transformRef('header-cell')
-		this.select.options = this.getLocalSelectOptions('select')
 	},
 	mounted() {
 		this.$emit('get-header-cell-width', this.$refs[this.headerCellRef].offsetWidth)
@@ -233,6 +241,7 @@ export default {
 		height: 48px;
 		display: flex;
 		align-items: center;
+		// flex: 1 1 auto;
 
 		&:not(:last-of-type) {
 			margin-right: 35px;
@@ -265,7 +274,7 @@ export default {
 		&--down {
 			width: 11px;
 			height: 10px;
-			background: url('../../assets/img/svg/down.svg') no-repeat center / cover;
+			background: url('../../assets/img/png/down.png') no-repeat center / cover;
 			transition: .2s;
 			opacity: .5;
 
@@ -302,7 +311,7 @@ export default {
 		min-width: 15px;
 		height: 14px;
 		margin-left: 10px;
-		background: url('../../assets/img/svg/filter.svg') no-repeat center / contain;
+		background: url('../../assets/img/png/filter.png') no-repeat center / contain;
 
 		&--active {
 			transform: scale(1.2);

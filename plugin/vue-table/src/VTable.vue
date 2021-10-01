@@ -17,6 +17,7 @@
 			:headerCellWidth="headerCellWidth"
 			:data="data"
 			:detail="detail"
+			:height="height"
 		/>
 		
 	</div>
@@ -56,12 +57,11 @@ export default {
 				h: [],
 				b: [],
 				bf: [],
-				f: null
 			})
 		},
 		detail: {
 			type: Boolean,
-			default: true
+			default: false
 		}
 	},
 	data: () => ({
@@ -83,12 +83,10 @@ export default {
 				? this.data.h
 				: null
 		},
-		getFooterType() {
-			return this.data.f.type
-		},
 	},
 	methods: {
 		getStyleValue(value) {
+			if (!value) return 'auto'
 			const type = typeof value
 
 			switch (type) {
@@ -110,9 +108,19 @@ export default {
 			this.headerCellWidth = array
 		}
 	},
+	watch: {
+		'data.b': {
+			deep: true,
+			immediate: true,
+			handler(data) {
+				this.data.bf = data
+			}
+		}
+	},
 	created() {
-		this.data.b = this.data.bf = [...this.data.b.map((curr, i) => ({ id: i + 1, ...curr  }))]
-		bus.$on('filter-data', options => this.$emit('filter-data', options))
+		bus.$on('filter-data', options => {
+			this.$emit('filter-data', options)
+		})
 	}
 }
 </script>

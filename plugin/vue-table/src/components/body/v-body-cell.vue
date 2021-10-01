@@ -1,67 +1,41 @@
 <template>
 	<div class="v-body-cell"
-		:style="{ minWidth: `${hcellWidth}px`, justifyContent: side }"
+		:style="{ minWidth: `${hcellWidth}px`, maxWidth: `${hcellWidth}px`, justifyContent: side }"
 	>		
 	
-		<!-- PAYMENT -->
-		<template v-if="type === 'payment'">
-			<span class="v-body-cell-more-box">
-				<span v-for="(value, i) of defineValue"
-					:key="i"
-					class="v-body-cell-more-item"
-				>
-					{{ value }}
-				</span>
-			</span>
-		</template>
-
-		<!-- FILE -->
-		<template v-else-if="type === 'file'">
-			<a class="v-body-cell-file"
-				:href="defineValue.path" download>
-				<span class="v-body-cell-pdf"></span>
-				{{ defineValue.title }}
-			</a>
-		</template>
-
-		<!-- SUM -->
-		<template v-else-if="type === 'sum'">
-			<span class="v-body-cell-sum"
-				:class="{ 'v-body-cell-sum--negative': !defineValue.isPositive }"
-			>
-				{{ defineValue.amount }} {{ defineValue.currency }}
-			</span>
-		</template>
-		
-		<!-- SELF COMPONENT -->
-		<template v-else-if="type === 'self'">
-			{{value.value}}
-			<component
-				:is="value.component.name"
-				v-bind="{ component: value.component }"
-			/>
-		</template>
-		
-
-		<!-- ELSE -->
-		<template v-else>
-			<span>
-				{{ this.value }}
-			</span>
-		</template>
+		<component v-if="typeof value === 'object' && value.component"
+			:is="value.component.name"
+			v-bind="{ component: value.component }"
+		/>
+		<span v-else
+			class="v-body-cell-name"
+		>
+			{{ value }}
+		</span>
 
 	</div>
 </template>
 
 <script>
+import VTariff from '../body-templates/v-tariff'
+import VStatus from '../body-templates/v-status'
+import VAction from '../body-templates/v-action'
+import VActive from '../body-templates/v-active'
+import VDetail from '../body-templates/v-detail'
+import VDate from '../body-templates/v-date'
+
 export default {
 	name: 'VBodyCell',
+	components: {
+		VTariff,
+		VStatus,
+		VAction,
+		VActive,
+		VDetail,
+		VDate
+	},
 	props: {
 		value: null,
-		type: {
-			type: String,
-			default: 'default' 
-		},
 		side: {
 			type: String,
 			default: 'flex-start'
@@ -71,54 +45,6 @@ export default {
 			default: 0
 		},
 	},
-	computed: {
-		// Обработка значений для конкретного шаблона
-		defineValue() {
-			switch (this.type) {
-				case 'payment': {
-					const typeOfMany = Array.isArray(this.value)
-						? 'array'
-						: typeof this.value
-
-					return typeOfMany === 'object'
-						? Object.values(this.value)
-						: this.value
-				}
-
-				case 'file': {
-					const { title, path } = this.value
-
-					return {
-						title: title ? title : 'Скачать',
-						path: path ? path : '/' 
-					}
-				}
-
-				case 'sum': {
-					const result = []
-					const { amount, currency } = this.value
-					const isPositive = +String(amount).replace(/ /, '') > 0
-					const arrAmount = String(amount).replace(/[\D]/, '').split('')
-
-					while(arrAmount.length > 3) {
-						result.unshift(...[' ', ...arrAmount.splice(-3)])
-					}
-
-					result.unshift(...[isPositive ? '+ ' : '- ', ...arrAmount])
-
-					return {
-						currency,
-						isPositive,
-						amount: result.join(''),
-					}
-				}
-
-				default: {
-				  return this.value
-				}
-			}
-		}
-	}
 }
 </script>
 
@@ -127,6 +53,7 @@ export default {
 		display: flex;
 		font-size: 14px;
 		font-weight: 400;
+		flex: 1 1 auto;
 		
 		&:not(:last-of-type) {
 			margin-right: 35px;
@@ -134,6 +61,11 @@ export default {
 		&:last-of-type {
 			margin: auto 0 auto auto;
 		}
+	}
+	.v-body-cell-name {
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
 	}
 	.v-body-cell-more-box {
 		display: flex;
@@ -169,7 +101,7 @@ export default {
 	.v-body-cell-pdf {
 		width: 20px;
 		height: 24px;
-		background: url('../../assets/img/svg/pdf.svg') no-repeat center / cover;
+		background: url('../../assets/img/png/pdf.png') no-repeat center / cover;
 		margin-bottom: 7px;
 	}
 

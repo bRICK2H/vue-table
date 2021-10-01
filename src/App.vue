@@ -41,7 +41,7 @@ export default {
 			h: [
 					{
 						type: 'payment',
-						width: 240,
+						width: 260,
 						side: 'flex-start',
 						title: 'Тип операции / Способ оплаты',
 						filter: true,
@@ -56,7 +56,7 @@ export default {
 					},
 					{
 						type: 'invoice',
-						width: 165,
+						width: 125,
 						side: 'center',
 						title: 'Счет',
 						filter: true,

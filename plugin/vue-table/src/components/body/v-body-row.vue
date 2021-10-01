@@ -12,7 +12,6 @@
 				<VBodyCell v-for="(value, key, i) in filterRow"
 					:key="key"
 					:value="value"
-					:type="types[i]"
 					:side="side[i]"
 					:hcellWidth="headerCellWidth[i]"
 				/>
@@ -21,7 +20,7 @@
 
 		<!-- Detail -->
 		<transition name="detail">
-			<div v-show="detail && active"
+			<div v-if="detail && active && detailComponent"
 				class="v-body-detail-box"
 			>
 				<component :is="detailComponent.name"
@@ -58,10 +57,6 @@ export default {
 			defaut: () => ([])
 		},
 		side: {
-			type: Array,
-			default: () => ([])
-		},
-		types: {
 			type: Array,
 			default: () => ([])
 		},
@@ -103,7 +98,7 @@ export default {
 	.v-body-toggle-detail {
 		width: 8px;
 		height: 14px;
-		background: url('../../assets/img/svg/arrow.svg') no-repeat center / contain;
+		background: url('../../assets/img/png/arrow.png') no-repeat center / contain;
 		margin-right: 10px;
 		cursor: pointer;
 		transition: .2s;
